@@ -65,7 +65,6 @@ jobs:
       - name: Deploying Litmus-Portal using **Helm chart**
         run: |
           kubectl create ns litmus
-          cd litmus-helm
           helm install litmuschaos --namespace litmus ./charts/litmus-2-0-0-beta/
 
       - name: Waiting for Litmus-Portal to be ready and port-forwarding the frontend port
