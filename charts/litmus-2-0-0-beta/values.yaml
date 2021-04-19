@@ -20,7 +20,7 @@ portal:
     replicas: 1
     image:
       repository: litmuschaos/litmusportal-frontend
-      tag: 2.0.0-Beta1
+      tag: 2.0.0-Beta3
       pullPolicy: "IfNotPresent"
     containerPort: 8080
     resources: {}
