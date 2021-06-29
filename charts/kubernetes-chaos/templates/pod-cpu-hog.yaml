@@ -8,9 +8,7 @@ kind: ChaosExperiment
 metadata:
   name: pod-cpu-hog
   labels:
-    instance: {{ .Release.Name }}
-    chart: {{ include "kubernetes-chaos.chart" . }}
-    litmuschaos.io/version: {{ .Chart.AppVersion }}
+    {{- include "kubernetes-chaos.labels" . | indent 4 }}
 spec:
   definition:
     scope: Namespaced
@@ -82,6 +80,10 @@ spec:
     # It is used in pumba lib only  
     - name: LIB_IMAGE
       value: "{{ .Values.image.litmusLIBImage.repository }}:{{ .Values.image.litmusLIBImage.tag }}"
+
+     ## It is used in pumba lib only    
+    - name: STRESS_IMAGE
+      value: "{{ .Values.image.resourceChaos.repository }}:{{ .Values.image.resourceChaos.tag }}" 
 
     - name: TARGET_PODS
       value: ''

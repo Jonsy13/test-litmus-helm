@@ -7,9 +7,7 @@ kind: ChaosExperiment
 metadata:
   name: container-kill
   labels:
-    instance: {{ .Release.Name }}
-    chart: {{ include "kubernetes-chaos.chart" . }}
-    litmuschaos.io/version: {{ .Chart.AppVersion }}
+    {{- include "kubernetes-chaos.labels" . | indent 4 }}
 spec:
   definition:
     scope: Namespaced
@@ -73,7 +71,7 @@ spec:
       value: '20'
 
     # provide the name of container runtime
-    # for litmus LIB, it supports docker, containerd, crio
+    # for litmus LIB, it supports docker, containerd, and crio
     # for pumba LIB, it supports docker only
     - name: CONTAINER_RUNTIME
       value: "{{ .Values.environment.runtime }}"

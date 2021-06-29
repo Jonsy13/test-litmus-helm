@@ -36,10 +36,10 @@ spec:
             x-kubernetes-preserve-unknown-fields: true
             type: object            
           spec:
-            x-kubernetes-preserve-unknown-fields: true
             type: object
             properties:
               definition:
+                x-kubernetes-preserve-unknown-fields: true
                 type: object
                 properties:
                   args:
@@ -60,6 +60,8 @@ spec:
                         value:
                           type: string
                   image:
+                    type: string
+                  imagePullPolicy:
                     type: string
                   labels:
                     type: object
@@ -98,7 +100,7 @@ spec:
                           type: array
                           items:
                             type: string
-                  configmaps:
+                  configMaps:
                     type: array
                     items:
                       type: object
@@ -145,6 +147,7 @@ spec:
                           allowEmptyValue: false
                           minLength: 1
                   securityContext:
+                    x-kubernetes-preserve-unknown-fields: true
                     type: object
                   hostPID:
                     type: boolean

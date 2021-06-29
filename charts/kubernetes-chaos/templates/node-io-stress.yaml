@@ -8,9 +8,7 @@ kind: ChaosExperiment
 metadata:
   name: node-io-stress
   labels: 
-    instance: {{ .Release.Name }}
-    chart: {{ include "kubernetes-chaos.chart" . }}
-    litmuschaos.io/version: {{ .Chart.AppVersion }}
+    {{- include "kubernetes-chaos.labels" . | indent 4 }}
 spec:
   definition:
     scope: Cluster
@@ -65,13 +63,24 @@ spec:
     - name: FILESYSTEM_UTILIZATION_BYTES
       value: ''
 
+    ## Number of core of CPU
+    - name: CPU
+      value: '1'   
+
     # Total number of workers default value is 4
     - name: NUMBER_OF_WORKERS
       value: '4'    
 
+    ## Total number of vm workers
+    - name: VM_WORKERS
+      value: '1'
+
     ## enter the comma separated target nodes name
     - name: TARGET_NODES
-      value: ''    
+      value: ''   
+
+    - name: NODE_LABEL
+      value: '' 
 
     # Period to wait before and after injection of chaos in sec
     - name: RAMP_TIME

@@ -4,6 +4,9 @@
 
 portalScope: cluster
 
+# -- Additional labels
+customLabels: {}
+
 adminConfig:
   DBUSER: "admin"
   DBPASSWORD: "1234"
@@ -12,16 +15,32 @@ adminConfig:
   DB_SERVER: ""
   DB_PORT: "27017"
 
-# Optional pod imagePullSecrets
-imagePullSecrets: []
+image:
+  imageRegistryName: litmuschaos
+  # Optional pod imagePullSecrets
+  imagePullSecrets: []
+
+ingress:
+  enabled: false
+  name: litmus-ingress
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    # nginx.ingress.kubernetes.io/rewrite-target: /$1
+
+  host: ""
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts: []
 
 portal:
   frontend:
     replicas: 1
     image:
-      repository: litmuschaos/litmusportal-frontend
-      tag: 2.0.0-Beta1
-      pullPolicy: "IfNotPresent"
+      repository: litmusportal-frontend
+      tag: 2.0.0-Beta8
+      pullPolicy: "Always"
     containerPort: 8080
     resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -38,40 +57,30 @@ portal:
       type: NodePort
       port: 9091
       targetPort: 8080
-    ingress:
-      enabled: false
-      annotations:
-        {}
-        # kubernetes.io/ingress.class: nginx
-        # kubernetes.io/tls-acme: "true"
-      hosts:
-        []
-        # - paths: ["/"]
-        #   host: ""
-
-      tls: []
-      #  - secretName: chart-example-tls
-      #    hosts: []
 
   server:
     replicas: 1
     serviceAccountName: litmus-server-account
     graphqlServer:
       image:
-        repository: litmuschaos/litmusportal-server
-        tag: 2.0.0-Beta3
-        pullPolicy: "IfNotPresent"
+        repository: litmusportal-server
+        tag: 2.0.0-Beta8
+        pullPolicy: "Always"
       containerPort: 8080
-      env:
-        SUBSCRIBER_IMAGE: "litmuschaos/litmusportal-subscriber:2.0.0-Beta3"
-        EVENT_TRACKER_IMAGE: "litmuschaos/litmusportal-event-tracker:2.0.0-Beta3"
-        ARGO_SERVER_IMAGE: "argoproj/argocli:v2.9.3"
-        ARGO_WORKFLOW_CONTROLLER_IMAGE: "argoproj/workflow-controller:v2.9.3"
-        ARGO_WORKFLOW_EXECUTOR_IMAGE: "argoproj/argoexec:v2.9.3"
-        LITMUS_CHAOS_OPERATOR_IMAGE: "litmuschaos/chaos-operator:1.13.2"
-        LITMUS_CHAOS_RUNNER_IMAGE: "litmuschaos/chaos-runner:1.13.2"
-        LITMUS_CHAOS_EXPORTER_IMAGE: "litmuschaos/chaos-exporter:1.13.2"
+      imageEnv:
+        SUBSCRIBER_IMAGE: "litmusportal-subscriber:2.0.0-Beta8"
+        EVENT_TRACKER_IMAGE: "litmusportal-event-tracker:2.0.0-Beta8"
+        ARGO_WORKFLOW_CONTROLLER_IMAGE: "workflow-controller:v2.9.3"
+        ARGO_WORKFLOW_EXECUTOR_IMAGE: "argoexec:v2.9.3"
+        LITMUS_CHAOS_OPERATOR_IMAGE: "chaos-operator:1.13.5"
+        LITMUS_CHAOS_RUNNER_IMAGE: "chaos-runner:1.13.5"
+        LITMUS_CHAOS_EXPORTER_IMAGE: "chaos-exporter:1.13.5"
+      genericEnv:
         SELF_CLUSTER: "true"
+        SERVER_SERVICE_NAME: "litmusportal-server-service"
+        PORTAL_ENDPOINT: "http://litmusportal-server-service:9002"
+        CONTAINER_RUNTIME_EXECUTOR: "k8sapi"
+        HUB_BRANCH_NAME: "v1.13.x"
       resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
       # choice for the user. This also increases chances charts run on environments with little
@@ -85,9 +94,9 @@ portal:
       #   memory: 400Mi
     authServer:
       image:
-        repository: litmuschaos/litmusportal-auth-server
-        tag: 2.0.0-Beta3
-        pullPolicy: "IfNotPresent"
+        repository: litmusportal-auth-server
+        tag: 2.0.0-Beta8
+        pullPolicy: "Always"
       containerPort: 3000
       env:
         ADMIN_USERNAME: "admin"
@@ -117,7 +126,7 @@ mongo:
   image:
     repository: mongo
     tag: 4.2.8
-    pullPolicy: "IfNotPresent"
+    pullPolicy: "Always"
   containerPort: 27017
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -138,3 +147,12 @@ mongo:
     type: ClusterIP
     port: 27017
     targetPort: 27017
+
+# OpenShift specific configuration
+openshift:
+  # If service should be exposed using an OpenShift route
+  route:
+    enabled: false
+    name: litmus-portal
+    annotations: {}
+    host: ""
