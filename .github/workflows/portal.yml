@@ -61,9 +61,12 @@ jobs:
       - name: Deploying Litmus-Portal using **Helm chart**
         run: |
           kubectl create ns litmus
+          echo -e "\n-------- Installing Checked out Helm-Chart ----------\n"
           helm install litmuschaos --namespace litmus ./charts/litmus-2-0-0-beta/
           source ./litmus-e2e/litmus/utils.sh
+          echo -e "\n-------- Verifying Control-Plane Components ----------\n"
           verify_all_components frontend,server litmus
+          echo -e "\n-------- Waiting for pods to be ready ----------\n"
           wait_for_pods litmus 720
 
       - name: Getting the Access URL for Litmus-Portal
@@ -85,7 +88,7 @@ jobs:
         env:
           CYPRESS_BASE_URL: ${{ env.URL }}
 
-      - name: Verifying Execution Plane components
+      - name: Verifying Execution-Plane Components
         if: always()
         run: |
           source ./litmus-e2e/litmus/utils.sh
